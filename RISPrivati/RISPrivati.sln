@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Batch", "Batch\Batch.csproj
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BatchRISPrivati", "BatchRISPrivati\BatchRISPrivati.csproj", "{513165F6-7B38-494F-841B-9B75BFF6B6DF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeneralPurposeLib", "GeneralPurposeLib\GeneralPurposeLib.csproj", "{2122CCC2-D83C-4CE6-A358-C2E772E4F6DF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{513165F6-7B38-494F-841B-9B75BFF6B6DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{513165F6-7B38-494F-841B-9B75BFF6B6DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{513165F6-7B38-494F-841B-9B75BFF6B6DF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2122CCC2-D83C-4CE6-A358-C2E772E4F6DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2122CCC2-D83C-4CE6-A358-C2E772E4F6DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2122CCC2-D83C-4CE6-A358-C2E772E4F6DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2122CCC2-D83C-4CE6-A358-C2E772E4F6DF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

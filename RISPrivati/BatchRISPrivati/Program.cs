@@ -61,21 +61,34 @@ namespace BatchRISPrivati
 
                 foreach (DataRow rich in richs.Rows)
                 {
-                    int IDRichiesta = rich["RICIdid"] != null ? (int)rich["RICIdid"] : 0;
-                    int IdPazGR = rich["idunico"]  != null ? (int)rich["idunico"] : 0;
-                    int IdPazHLT = rich["PazIDID_hlt"] != null ? (int)rich["PazIDID_hlt"] : 0;
+                    int IDRichiesta = rich.Table.Columns.Contains("RICIdid") ? (int)rich["RICIdid"] : 0;
+                    int IdPazGR = rich.Table.Columns.Contains("idunico") ? (int)rich["idunico"] : 0;
+                    int IdPazHLT = rich.Table.Columns.Contains("PazIDID_hlt") ? (int)rich["PazIDID_hlt"] : 0;
+
+                    if(IDRichiesta==0 || IdPazGR==0 || IdPazHLT==0){
+                        log.Info("Ottenuti valori di id richiesta, paziente GR e HLT nulli. L'iterazione verrà saltata!");
+                        log.Warn("Ottenuti valori di id richiesta, paziente GR e HLT nulli. L'iterazione verrà saltata!");
+                        continue;
+                    }
 
                     string insertquery = string.Format("insert into [GR].[dbo].[EPIS] (EPISPAZI, EPISDAIN, EPISTIPO, EPISCHIU, EPISREPA) VALUES ({0},' {1}', {2}, {3}, {4}); select @@identity AS episidid;", IdPazGR, DateTime.Now.ToString("yyyy-MM-dd"), 9, 1, 2);
                     log.Info(string.Format("Esecuzione inserimento: Avvio ..."));
                     DataTable insertJob = DataAccessLayer.DBSQL.ExecuteQuery(connStr, insertquery, false);
                     log.Info(string.Format("Esecuzione inserimento: Completato!"));
 
-                    var IDEpisGR = insertJob.Rows[0]["episidid"] != null ? insertJob.Rows[0]["episidid"] : 0;
+                    var IDEpisGR = insertJob.Rows[0].Table.Columns.Contains("episidid") ? insertJob.Rows[0]["episidid"] : null;
 
-                    string updatequery = string.Format("update [GR].[dbo].[RISPrivatiRichieste] set [EpisIDID_GR] = {0} where [RicIDID] = {1}", IDEpisGR, IDRichiesta);
+                    if (IDEpisGR == null)
+                    {
+                        log.Info("Ottenuti valore di id episodio GR nullo. L'iterazione verrà saltata!");
+                        log.Warn("Ottenuti valore di id episodio GR nullo. L'iterazione verrà saltata!");
+                        continue;
+                    }
+
+                    string updatequery = string.Format("update [GR].[dbo].[RISPrivatiRichieste] set [EpisIDID_GR] = {0}, [PazIDID_GR] = {1} where [RicIDID] = {2}", IDEpisGR, IdPazGR, IDRichiesta);
                     log.Info(string.Format("Esecuzione aggiornamento: Avvio ..."));
                     int rows = DataAccessLayer.DBSQL.ExecuteNonQuery(connStr, updatequery);
-                    log.Info(string.Format("Esecuzione inserimento: Completato! Aggiornate {0} righe!", rows));
+                    log.Info(string.Format("Esecuzione aggiornamento: Completato! Aggiornate {0} righe!", rows));
 
                     log.Info(string.Format("Esecuzione Job2.1: Completato con successo!"));
                 }
