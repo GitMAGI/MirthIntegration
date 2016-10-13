@@ -70,10 +70,18 @@ namespace BatchRISPrivati
                         log.Warn("Ottenuti valori di id richiesta, paziente GR e HLT nulli. L'iterazione verrà saltata!");
                         continue;
                     }
-
-                    string insertquery = string.Format("insert into [GR].[dbo].[EPIS] (EPISPAZI, EPISDAIN, EPISTIPO, EPISCHIU, EPISREPA) VALUES ({0},' {1}', {2}, {3}, {4}); select @@identity AS episidid;", IdPazGR, DateTime.Now.ToString("yyyy-MM-dd"), 9, 1, 2);
+                    
+                    string insertquery = "insert into [GR].[dbo].[EPIS] (EPISPAZI, EPISDAIN, EPISTIPO, EPISCHIU, EPISREPA) VALUES (@epispazi, @episdain, @epistipo, @epischiu, @episrepa); select @@identity AS episidid;";
+                    Dictionary<string, object> atts = new Dictionary<string, object>()
+                    {
+                        {"epispazi", IdPazGR},
+                        {"episdain", DateTime.Now},
+                        {"epistipo", 9},
+                        {"epischiu", 1},
+                        {"@episrepa", 2}
+                    };
                     log.Info(string.Format("Esecuzione inserimento: Avvio ..."));
-                    DataTable insertJob = DataAccessLayer.DBSQL.ExecuteQuery(connStr, insertquery, false);
+                    DataTable insertJob = DataAccessLayer.DBSQL.ExecuteQueryWithParams(connStr, insertquery, atts);
                     log.Info(string.Format("Esecuzione inserimento: Completato!"));
 
                     var IDEpisGR = insertJob.Rows[0].Table.Columns.Contains("episidid") ? insertJob.Rows[0]["episidid"] : null;
@@ -85,9 +93,15 @@ namespace BatchRISPrivati
                         continue;
                     }
 
-                    string updatequery = string.Format("update [GR].[dbo].[RISPrivatiRichieste] set [EpisIDID_GR] = {0}, [PazIDID_GR] = {1} where [RicIDID] = {2}", IDEpisGR, IdPazGR, IDRichiesta);
+                    string updatequery = "update [GR].[dbo].[RISPrivatiRichieste] set [EpisIDID_GR] = @episidid, [PazIDID_GR] = @paziidid where [RicIDID] = @ricidid";
+                    atts = new Dictionary<string, object>()
+                    {
+                        {"episidid", IDEpisGR},
+                        {"paziidid", IdPazGR},
+                        {"ricidid", IDRichiesta}
+                    };
                     log.Info(string.Format("Esecuzione aggiornamento: Avvio ..."));
-                    int rows = DataAccessLayer.DBSQL.ExecuteNonQuery(connStr, updatequery);
+                    int rows = DataAccessLayer.DBSQL.ExecuteNonQueryWithParams(connStr, updatequery, atts);
                     log.Info(string.Format("Esecuzione aggiornamento: Completato! Aggiornate {0} righe!", rows));
 
                     log.Info(string.Format("Esecuzione Job2.1: Completato con successo!"));
@@ -95,7 +109,7 @@ namespace BatchRISPrivati
             }
             catch(Exception e)
             {
-                log.Error(string.Format("Esecuzione Job2.1: Errore durante l'esecuzione. Errore:{0}", e.Message));
+                log.Error(string.Format("Esecuzione Job2.1: Errore durante l'esecuzione. Errore: {0}", e.Message));
             }           
 
             
@@ -110,7 +124,7 @@ namespace BatchRISPrivati
             }
             catch (Exception e)
             {
-                log.Error(string.Format("Esecuzione Job3: Errore durante l'esecuzione. Errore:{0}", e.Message));
+                log.Error(string.Format("Esecuzione Job3: Errore durante l'esecuzione. Errore: {0}", e.Message));
             }
 
 
